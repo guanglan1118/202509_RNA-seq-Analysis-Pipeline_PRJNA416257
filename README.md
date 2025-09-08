@@ -128,6 +128,7 @@ pwd #sra/fastq
 - SRR7179506_pass.fastq.gz  SRR7179510_pass.fastq.gz  SRR7179522_pass.fastq.gz  SRR7179526_pass.fastq.gz  SRR7179540_pass.fastq.gz
 - SRR7179507_pass.fastq.gz  SRR7179511_pass.fastq.gz  SRR7179523_pass.fastq.gz  SRR7179527_pass.fastq.gz  SRR7179541_pass.fastq.gz
 
+### 1.2.3) Concatenating FASTQ files
 
 
 
@@ -142,45 +143,6 @@ pwd #sra/fastq
 
 
 
-This will produce files like:
-- raw/SRR26030905/SRR26030905.sra
-- raw/SRR26030906/SRR26030906.sra
-- raw/SRR26030907/SRR26030907.sra
-- raw/SRR26030908/SRR26030908.sra
-- raw/SRR26030909/SRR26030909.sra
-- raw/SRR26030910/SRR26030910.sra
-
-### 1.3) Converts .sra archive files into plain FASTQ files
-*convert single file* 
-~~~
-#bash
-mkdir -p raw_fastq
-fasterq-dump raw/SRR26030905/SRR26030905.sra -e 8 -p --split-files -t tmp -O raw_fastq/
-~~~
-
-*convert batch file* 
-~~~
-#bash
-pwd #project_PRJNA1014743
-for sra in raw/*/*.sra; do
-  SRR=$(basename "$sra" .sra)
-  echo "==> Converting $SRR"
-  fasterq-dump "$sra" -e 8 -p --split-files -t tmp -O raw_fastq/
-done
-~~~
-This will produce files like:
-- raw_fastq/SRR26030905_1.fastq
-- raw_fastq/SRR26030905_2.fastq
-- raw_fastq/SRR26030906_1.fastq
-- raw_fastq/SRR26030906_2.fastq
-- raw_fastq/SRR26030907_1.fastq
-- raw_fastq/SRR26030907_2.fastq
-- raw_fastq/SRR26030908_1.fastq
-- raw_fastq/SRR26030908_2.fastq
-- raw_fastq/SRR26030909_1.fastq
-- raw_fastq/SRR26030909_2.fastq
-- raw_fastq/SRR26030910_1.fastq
-- raw_fastq/SRR26030910_2.fastq
 
 ## 2) Raw data QC
 ### 2.1) intsall fastqc
