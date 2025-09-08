@@ -166,10 +166,38 @@ LNCAP_Hypoxia_S1.fastq.gz  LNCAP_Normoxia_S1.fastq.gz  PC3_Hypoxia_S1.fastq.gz  
 LNCAP_Hypoxia_S2.fastq.gz  LNCAP_Normoxia_S2.fastq.gz  PC3_Hypoxia_S2.fastq.gz  PC3_Normoxia_S2.fastq.gz
 ~~~
 
+## 2) Mapping reads using STAR
+~~~
+zcat LNCAP_Hypoxia_S1.fastq.gz | head -4
+
+@SRR7179520.1.1 1 length=76
+GTGAANATAGGCCTTAGAGCACTTGANGTGNTAGNGCANGTNGNNCCGGAACGNNNNNNNNAGGTNGNNNGNGTTG
++SRR7179520.1.1 1 length=76
+AAAAA#EEEEEEEEEEEEEEEEEEEE#EEE#EEE#EEE#EE#E##EEEEEEEE########EEEE#E###E#EAEA
+~~~
+
+**Building the genome index**
+~~~
+mkdir ref/
+wget ftp://ftp.ensembl.org/pub/release-99/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.primary_assembly.fa.gz
+wget ftp://ftp.ensembl.org/pub/release-99/gtf/homo_sapiens/Homo_sapiens.GRCh38.99.gtf.gz
+gunzip *.gz
+~~~
 
 
 
-## 2) Raw data QC
+
+
+
+
+
+
+
+
+
+
+
+
 ### 2.1) intsall fastqc
 ~~~
 # bash
