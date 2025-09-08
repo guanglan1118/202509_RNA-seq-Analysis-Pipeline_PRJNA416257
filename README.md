@@ -88,16 +88,54 @@ This will produce files like:
 - 76, 0   SRA_READ_TYPE_BIOLOGICAL, SRA_READ_TYPE_TECHNICAL
 - 76, 0   SRA_READ_TYPE_BIOLOGICAL, SRA_READ_TYPE_TECHNICAL
 
-
-
-*copy-pasteable ways to bulk download .sra files* 
+### 1.2.2) Downloads batch cases
 ~~~
-cut -d, -f2 meta/metadata.csv | tail -n +2 | tr -d '\r' | while read -r SRR; do
-  [ -z "$SRR" ] && continue
-  echo "==> prefetch $SRR"
-  prefetch --max-size 200G -O raw "$SRR"
+# bash
+# (1) download .sra files into ./sra directory
+mkdir -p sra
+
+for sra_id in SRR7179504 SRR7179505 SRR7179506 SRR7179507 \
+              SRR7179508 SRR7179509 SRR7179510 SRR7179511 \
+              SRR7179520 SRR7179521 SRR7179522 SRR7179523 \
+              SRR7179524 SRR7179525 SRR7179526 SRR7179527 \
+              SRR7179536 SRR7179537 SRR7179540 SRR7179541
+do
+    echo "Currently downloading: $sra_id"
+    prefetch $sra_id --output-directory ./sra
 done
 ~~~
+
+~~~
+# bash
+# (2) convert to fastq.gz
+mkdir -p fastq
+for sra_id in SRR7179504 SRR7179505 SRR7179506 SRR7179507 \
+              SRR7179508 SRR7179509 SRR7179510 SRR7179511 \
+              SRR7179520 SRR7179521 SRR7179522 SRR7179523 \
+              SRR7179524 SRR7179525 SRR7179526 SRR7179527 \
+              SRR7179536 SRR7179537 SRR7179540 SRR7179541
+do
+    echo "Generating fastq for: $sra_id"
+    fastq-dump --outdir fastq --gzip --skip-technical \
+               --readids --read-filter pass --dumpbase --split-3 --clip \
+                ./$sra_id/$sra_id.sra
+done       
+~~~
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 This will produce files like:
 - raw/SRR26030905/SRR26030905.sra
