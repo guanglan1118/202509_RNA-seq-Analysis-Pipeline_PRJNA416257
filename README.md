@@ -8,7 +8,7 @@
 ## Folder layout
 ~~~
 # bash
-project_PRJNA1014743/
+project_PRJNA416257/
 ├─ raw/              # FASTQs
 ├─ ref/              # reference (Salmon index, GTF/FA)
 ├─ qc/               # FastQC & MultiQC
@@ -18,7 +18,8 @@ project_PRJNA1014743/
 └─ results/          # DE tables, plots, GSEA
 ~~~
 ## 0) Get the SRR runs & metadata (SRA → FASTQ)
-<https://www.ncbi.nlm.nih.gov/sra/?term=PRJNA1014743>
+<https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE106305>
+<https://www.ncbi.nlm.nih.gov/Traces/study/?acc=PRJNA416257&o=acc_s%3Aa)
 
 On the PRJNA1014743 page, click “Send to” → “Run Selector” → “Run Selector” → "Download Metadata/Accession List". 
 Save as **metadata.csv**
