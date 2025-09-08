@@ -1,15 +1,15 @@
-# 202509_PRJNA416257
-# RNA-seq Analysis Pipeline
+# RNA-seq Analysis Pipeline / 202509_PRJNA416257
 ## Datasets
 - Dataset PRJNA416257
-- Nat Commun.2019  /  PMID: 30655535
+- Nat Commun.2019/PMID: 30655535
 - ONECUT2 is a driver of neuroendocrine prostate cancer
 
 ## Folder layout
 ~~~
 # bash
 project_PRJNA416257/
-├─ raw/              # FASTQs
+├─ raw/              # sra
+├─ raw_fastq/        # FASTQs
 ├─ ref/              # reference (Salmon index, GTF/FA)
 ├─ qc/               # FastQC & MultiQC
 ├─ quant/            # Salmon outputs per sample
@@ -19,9 +19,10 @@ project_PRJNA416257/
 ~~~
 ## 0) Get the SRR runs & metadata (SRA → FASTQ)
 <https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE106305>
+
 <https://www.ncbi.nlm.nih.gov/Traces/study/?acc=PRJNA416257&o=acc_s%3Aa>
 
-On the PRJNA1014743 page, click “Send to” → “Run Selector” → “Run Selector” → "Download Metadata/Accession List". 
+On the PRJNA416257 page, click “Send to” → “Run Selector” → “Run Selector” → "Download Metadata/Accession List". 
 Save as **metadata.csv**
 Edit a minimal metadata.csv with columns:
 
@@ -46,20 +47,48 @@ fasterq-dump --version  #fasterq-dump : 3.2.1
 ~~~
 
 ### 1.2) Downloads the sequencing run from NCBI SRA
-
-*download single .sra files* 
+### 1.2.1) Downloads single cases
+*download .sra files* 
 ~~~
 bash
-pwd # project_PRJNA1014743
-prefetch --max-size 200G -O raw_test SRR26030905 
-prefetch --max-size 200G -O raw_test SRR26030906 
-prefetch --max-size 200G -O raw_test SRR26030907
-prefetch --max-size 200G -O raw_test SRR26030908 
-prefetch --max-size 200G -O raw_test SRR26030909
-prefetch --max-size 200G -O raw_test SRR26030910
-
-ls -lh raw_test/SRR26030905/ #check the file size 
+pwd # project_PRJNA416257/raw/
+prefetch SRR7179504
 ~~~
+This will produce files like:
+- raw/SRR7179504.sra
+
+*fastq-dump to extract .sra files into a FASTQ file*
+~~~
+bash
+pwd # project_PRJNA416257/raw_fastq
+mkdir -p raw_fastq
+# Extract into raw_fastq/
+fastq-dump --split-files -O raw_fastq raw/SRR7179504.sra
+~~~
+This will produce files like:
+- raw_fastq/SRR7179504_1.fastq
+- which means it might single-end sequencing
+
+check single or paired end sequence
+~~~
+# bash
+# check if SRA file is complete
+vdb-validate raw/SRR7179504.sra
+
+# check basic info of SRA file 
+vdb-dump --info raw/SRR7179504.sra
+~~~
+
+~~~
+# check single or paired end sequence
+vdb-dump -f tab -C READ_LEN,READ_TYPE -R 1-3 raw/SRR7179504.sra
+~~~
+This will produce files like:
+- 76, 0   SRA_READ_TYPE_BIOLOGICAL, SRA_READ_TYPE_TECHNICAL
+- 76, 0   SRA_READ_TYPE_BIOLOGICAL, SRA_READ_TYPE_TECHNICAL
+- 76, 0   SRA_READ_TYPE_BIOLOGICAL, SRA_READ_TYPE_TECHNICAL
+
+
 
 *copy-pasteable ways to bulk download .sra files* 
 ~~~
