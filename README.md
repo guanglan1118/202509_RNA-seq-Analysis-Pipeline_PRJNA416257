@@ -15,7 +15,7 @@ project_PRJNA416257/
 ├─ r/                # R scripts
 └─ results/          # DE tables, plots, GSEA
 ~~~
-## 0) Get the SRR runs & metadata (SRA → FASTQ)
+## 1) Get the SRR runs & metadata 
 <https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE106305>
 
 <https://www.ncbi.nlm.nih.gov/Traces/study/?acc=PRJNA416257&o=acc_s%3Aa>
@@ -26,8 +26,8 @@ Edit a minimal metadata.csv with columns:
 
 ![metadata](figures/metadata.png)
 
-## 1) Download FASTQs
-### 1.1) intsall fasterq-dump 
+## 2) Download FASTQs
+### 2.1) intsall fasterq-dump 
 
 *fasterq-dump is a tool from SRA-tools (the NCBI Sequence Read Archive toolkit)*
 
@@ -44,8 +44,8 @@ which fasterq-dump
 fasterq-dump --version  #fasterq-dump : 3.2.1
 ~~~
 
-### 1.2) Downloads the sequencing run from NCBI SRA
-### 1.2.1) Downloads single cases
+### 2.2) Downloads the sequencing run from NCBI SRA
+### 2.2.1) Downloads single cases
 *download .sra files* 
 ~~~
 bash
@@ -86,7 +86,7 @@ This will produce files like:
 - 76, 0   SRA_READ_TYPE_BIOLOGICAL, SRA_READ_TYPE_TECHNICAL
 - 76, 0   SRA_READ_TYPE_BIOLOGICAL, SRA_READ_TYPE_TECHNICAL
 
-### 1.2.2) Downloads batch cases
+### 2.2.2) Downloads batch cases
 ~~~
 # bash
 # (1) download .sra files into ./sra directory
@@ -126,7 +126,7 @@ pwd #sra/fastq
 - SRR7179506_pass.fastq.gz  SRR7179510_pass.fastq.gz  SRR7179522_pass.fastq.gz  SRR7179526_pass.fastq.gz  SRR7179540_pass.fastq.gz
 - SRR7179507_pass.fastq.gz  SRR7179511_pass.fastq.gz  SRR7179523_pass.fastq.gz  SRR7179527_pass.fastq.gz  SRR7179541_pass.fastq.gz
 
-### 1.2.3) Concatenating FASTQ files
+### 2.2.3) Concatenating FASTQ files
 ~~~
 pwd #sra/fastq
 cat SRR7179504_pass.fastq.gz SRR7179505_pass.fastq.gz SRR7179506_pass.fastq.gz SRR7179507_pass.fastq.gz  > LNCAP_Normoxia_S1.fastq.gz
@@ -164,7 +164,7 @@ LNCAP_Hypoxia_S1.fastq.gz  LNCAP_Normoxia_S1.fastq.gz  PC3_Hypoxia_S1.fastq.gz  
 LNCAP_Hypoxia_S2.fastq.gz  LNCAP_Normoxia_S2.fastq.gz  PC3_Hypoxia_S2.fastq.gz  PC3_Normoxia_S2.fastq.gz
 ~~~
 
-## 2) Mapping reads using STAR
+## 3) Mapping reads using STAR
 ~~~
 zcat LNCAP_Hypoxia_S1.fastq.gz | head -4
 
@@ -174,7 +174,7 @@ GTGAANATAGGCCTTAGAGCACTTGANGTGNTAGNGCANGTNGNNCCGGAACGNNNNNNNNAGGTNGNNNGNGTTG
 AAAAA#EEEEEEEEEEEEEEEEEEEE#EEE#EEE#EEE#EE#E##EEEEEEEE########EEEE#E###E#EAEA
 ~~~
 
-**Building the genome index**
+### 3.1) download materials 
 ~~~
 mkdir ref/
 wget ftp://ftp.ensembl.org/pub/release-99/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.primary_assembly.fa.gz
@@ -182,14 +182,64 @@ wget ftp://ftp.ensembl.org/pub/release-99/gtf/homo_sapiens/Homo_sapiens.GRCh38.9
 gunzip *.gz
 ~~~
 
-**Building STAR index**
+### 3.2) Build a STAR index
 
+First, prepare the data:
+- Genome FASTA (e.g., GRCh38.primary_assembly.genome.fa)
+- GENCODE annotation GTF (e.g., gencode.v44.annotation.gtf)
 
+star_genome.sh
+~~~
+#!/bin/bash
+#BSUB -J star_genome
+#BSUB -q standard
+#BSUB -n 32
+#BSUB -W 24:00
+#BSUB -o star_genome.%J.out
+#BSUB -e star_genome.%J.err
+#BSUB -R "span[hosts=1]"
+# ~32 * 5.6GB ≈ 180GB total
+#BSUB -R "rusage[mem=5600]"
+# Hard cap in MB (>= requested total)
+#BSUB -M 180000
 
+set -euo pipefail
 
+# initialize conda in batch shells
+eval "$(conda shell.bash hook)"
+conda activate sra
 
+cd /research/groups/yanggrp/home/glin/work_2025/Sep/project_PRJNA1014743/ref
+rm -rf STAR_index_gencodev44 _STARtmp
+mkdir -p STAR_index_gencodev44
 
-**Mapping reads**
+STAR \
+  --runThreadN 32 \
+  --runMode genomeGenerate \
+  --genomeDir STAR_index_gencodev44 \
+  --genomeFastaFiles GRCh38.primary_assembly.genome.fa \
+  --sjdbGTFfile gencode.v44.annotation.gtf \
+  --sjdbOverhang 149 \
+  --limitGenomeGenerateRAM 170000000000
+~~~
+
+~~~
+# bash
+bsub < star_genome.sh
+# check the running process
+bjobs
+~~~
+
+monitor 
+~~~
+bjobs -w -u $USER            # see when it’s RUN and on which node
+bpeek -f <JOBID>             # live stdout once RUN (replace with actual ID)
+tail -f star_genome.<JOBID>.out
+tail -f star_genome.<JOBID>.err
+tail -f STAR_index_gencodev44/Log.out
+~~~
+
+### 3.3) Mapping reads
 
 mapping.sh 
 ~~~
@@ -337,10 +387,9 @@ mapping/make_counts.py
 python3 make_counts.py
 ~~~
 This will produce files like:
-  Counts: raw_counts.csv
+  Counts: **raw_counts.csv**
   QC:     qc.csv
 
-**select the read counts by sample**clear 
 
 
 
