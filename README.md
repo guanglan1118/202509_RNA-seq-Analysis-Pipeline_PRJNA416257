@@ -338,7 +338,7 @@ mapping/
       └── [a few STAR logs, unless cleaned]
 
 
-
+**select the read counts by sample**
 
 
 
