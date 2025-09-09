@@ -387,8 +387,8 @@ mapping/make_counts.py
 python3 make_counts.py
 ~~~
 This will produce files like:
-  Counts: **raw_counts.csv**
-  QC:     qc.csv
+- Counts: **raw_counts.csv**
+- QC:     qc.csv
 
 
 
