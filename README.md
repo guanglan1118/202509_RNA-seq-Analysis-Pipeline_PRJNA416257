@@ -390,6 +390,7 @@ This will produce files like:
 - Counts: **raw_counts.csv**
 - QC:     qc.csv
 
+## 4) Differential expression analysis
 
 
 
