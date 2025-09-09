@@ -328,7 +328,14 @@ mkdir -p logs mapping
 bsub < mapping.sh
 ~~~
 
-
+This will produce files like:
+mapping/
+ └── SRR123456/
+      ├── SRR123456_Aligned.sortedByCoord.out.bam
+      ├── SRR123456_Aligned.sortedByCoord.out.bam.bai
+      ├── SRR123456_ReadsPerGene.out.tab
+      ├── SRR123456_Log.final.out
+      └── [a few STAR logs, unless cleaned]
 
 
 
