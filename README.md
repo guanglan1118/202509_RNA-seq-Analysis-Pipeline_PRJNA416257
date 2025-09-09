@@ -184,9 +184,149 @@ wget ftp://ftp.ensembl.org/pub/release-99/gtf/homo_sapiens/Homo_sapiens.GRCh38.9
 gunzip *.gz
 ~~~
 
+**Building STAR index**
 
 
 
+
+
+
+**Mapping reads**
+
+mapping.sh 
+~~~
+#!/usr/bin/env bash
+#BSUB -J star_map_gencodev44
+#BSUB -o logs/star_map_gencodev44.%J.out
+#BSUB -e logs/star_map_gencodev44.%J.err
+#BSUB -n 16
+#BSUB -R "span[hosts=1]"
+#BSUB -R "rusage[mem=4000]"     # ~4 GB/core -> ~64 GB total
+#BSUB -M 64000                  # hard memory limit (MB)
+#BSUB -W 24:00                  # walltime hh:mm
+# (no -q line; uses default queue)
+
+set -euo pipefail
+
+# =========================
+# Project-specific settings
+# =========================
+PROJECT="/research/groups/yanggrp/home/glin/work_2025/Sep/project_PRJNA416257"
+FASTQ_DIR="${PROJECT}/sra/fastq"   # your FASTQs are here (single-end)
+GENOME_DIR="${PROJECT}/ref/STAR_index_gencodev44"
+GTF="/research/groups/yanggrp/home/glin/work_2025/Sep/project_PRJNA1014743/ref/gencode.v44.annotation.gtf"
+OUTROOT="${PROJECT}/mapping"       # all results go here
+THREADS=${LSB_DJOB_NUMPROC:-16}    # LSF core count (default 16)
+
+# Optional: tidy small intermediates after each sample
+CLEAN_INTERMEDIATES=true
+
+# Optional: activate your environment
+# source ~/.bashrc
+# conda activate sra
+# or: module load STAR
+
+# =========================
+# Pre-flight checks
+# =========================
+mkdir -p "${OUTROOT}" logs
+
+if ! command -v STAR >/dev/null 2>&1; then
+  echo "ERROR: STAR not found in PATH." >&2
+  exit 1
+fi
+
+if [[ ! -s "${GENOME_DIR}/Genome" ]]; then
+  echo "ERROR: STAR index appears incomplete at ${GENOME_DIR} (missing Genome file)." >&2
+  exit 1
+fi
+
+if [[ ! -s "${GTF}" ]]; then
+  echo "ERROR: GTF not found at ${GTF}" >&2
+  exit 1
+fi
+
+shopt -s nullglob
+FASTQS=("${FASTQ_DIR}"/*.fastq.gz)
+if (( ${#FASTQS[@]} == 0 )); then
+  echo "No FASTQ files found in ${FASTQ_DIR}" >&2
+  exit 1
+fi
+
+echo "Found ${#FASTQS[@]} FASTQ files in ${FASTQ_DIR}"
+echo "Output directory: ${OUTROOT}"
+echo "Using index: ${GENOME_DIR}"
+echo "Using GTF: ${GTF}"
+echo "Threads: ${THREADS}"
+
+# =========================
+# Alignment loop (single-end)
+# =========================
+for fq in "${FASTQS[@]}"; do
+  sample=$(basename "${fq}" .fastq.gz)
+  outdir="${OUTROOT}/${sample}"
+  mkdir -p "${outdir}"
+
+  echo "[$(date)] Mapping ${sample}"
+
+  STAR \
+    --runThreadN "${THREADS}" \
+    --genomeDir "${GENOME_DIR}" \
+    --readFilesIn "${fq}" \
+    --readFilesCommand zcat \
+    --sjdbGTFfile "${GTF}" \
+    --twopassMode Basic \
+    --outSAMtype BAM SortedByCoordinate \
+    --outFileNamePrefix "${outdir}/${sample}_" \
+    --quantMode GeneCounts
+
+  # Index BAM if samtools is available
+  if command -v samtools >/dev/null 2>&1; then
+    samtools index -@ "${THREADS}" "${outdir}/${sample}_Aligned.sortedByCoord.out.bam"
+  fi
+
+  # Optional cleanup: keep BAM + BAI + counts + final log
+  if [[ "${CLEAN_INTERMEDIATES}" == "true" ]]; then
+    rm -f "${outdir}/${sample}_Aligned.out.bam" 2>/dev/null || true
+    rm -f "${outdir}/${sample}_SJ.out.tab" 2>/dev/null || true
+    rm -f "${outdir}/${sample}_Log.out" 2>/dev/null || true
+    rm -f "${outdir}/${sample}_Log.progress.out" 2>/dev/null || true
+    rm -f "${outdir}/${sample}_Chimeric.out.junction" 2>/dev/null || true
+  fi
+done
+
+# =========================
+# Summarize mapping metrics
+# =========================
+summary="${OUTROOT}/mapping_summary.tsv"
+echo -e "sample\tUniquely_mapped%\tReads_in_genes_Unstranded\tReads_in_genes_FirstStrand\tReads_in_genes_SecondStrand" > "${summary}"
+
+for log in "${OUTROOT}"/*/*_Log.final.out; do
+  s=$(basename "${log}" _Log.final.out)
+  # Parse "Uniquely mapped reads %" from STAR Log.final.out (robust to spacing)
+  uniq_pct=$(awk -F '|' '/Uniquely mapped reads %/ {gsub(/%/,"",$2); gsub(/^[ \t]+|[ \t]+$/,"",$2); print $2}' "${log}")
+  rpg_dir="${OUTROOT}/${s%_*}"
+  rpg="${rpg_dir}/${s}_ReadsPerGene.out.tab"
+  if [[ -f "${rpg}" ]]; then
+    # Sum counts across genes (skip header rows N_*)
+    unstr=$(awk 'BEGIN{sum=0} !/^N_/ {sum+=$2} END{print sum}' "${rpg}")
+    firsts=$(awk 'BEGIN{sum=0} !/^N_/ {sum+=$3} END{print sum}' "${rpg}")
+    seconds=$(awk 'BEGIN{sum=0} !/^N_/ {sum+=$4} END{print sum}' "${rpg}")
+  else
+    unstr=NA; firsts=NA; seconds=NA
+  fi
+  echo -e "${s}\t${uniq_pct}\t${unstr}\t${firsts}\t${seconds}" >> "${summary}"
+done
+
+echo "[$(date)] Done."
+echo "Results per sample are in: ${OUTROOT}/<sample>/"
+echo "Project summary written to: ${summary}"
+~~~
+
+~~~
+mkdir -p logs mapping
+bsub < mapping.sh
+~~~
 
 
 
