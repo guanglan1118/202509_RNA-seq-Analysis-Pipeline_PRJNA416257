@@ -6,13 +6,13 @@
 
 ## structure layout
 ~~~
-project_PRJNA416257/
+project_PRJNA416257
 ├─ 1) Get sra sample list          
 ├─ sra_fastq/                    
 ├─ ref/                         
 ├─ mapping/                     
 ├─ r/                           
-
+~~~
 
 
 
