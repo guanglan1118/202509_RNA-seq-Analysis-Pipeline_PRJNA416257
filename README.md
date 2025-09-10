@@ -19,11 +19,7 @@ project_PRJNA416257/
 
 <https://www.ncbi.nlm.nih.gov/Traces/study/?acc=PRJNA416257&o=acc_s%3Aa>
 
-On the PRJNA416257 page, click “Send to” → “Run Selector” → “Run Selector” → "Download Metadata/Accession List". 
-Save as **metadata.csv**
-Edit a minimal metadata.csv with columns:
-
-![metadata](figures/metadata.png)
+![samplelist](figures/sample_list.png)
 
 ## 2) Download FASTQs
 ### 2.1) intsall fasterq-dump 
