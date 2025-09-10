@@ -12,8 +12,7 @@ project_PRJNA416257/
 ├─ sra_fastq/        # FASTQs
 ├─ ref/              # reference (STAR) STAR_index_gencodev44
 ├─ mapping/          # raw_counts.csv
-├─ r/                # R scripts
-└─ results/          # DE tables, plots, GSEA
+├─ r/                # DE tables, plots, GSEA
 ~~~
 ## 1) Get the SRR runs & metadata 
 <https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE106305>
@@ -391,15 +390,25 @@ This will produce files like:
 - QC:     qc.csv
 
 ## 4) Differential expression analysis
+~~~
+
+
+~~~
+### 4.1) Variable Genes Heatmap
 
 
 
 
+### 4.2) Variable Genes Heatmap
 
 
 
 
+### 4.3) PCA Plot
 
+
+
+### 4.4) 
 
 
 
