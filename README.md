@@ -1,4 +1,4 @@
-# refer to 
+# Refer to 
 <https://github.com/erilu/bulk-rnaseq-analysis?tab=readme-ov-file#introduction>
 # RNA-seq Analysis Pipeline/202509_PRJNA416257
 ## Datasets 
