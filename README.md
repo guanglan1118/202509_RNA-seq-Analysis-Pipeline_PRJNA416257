@@ -4,9 +4,22 @@
 - Nat Commun.2019/PMID: 30655535
 - ONECUT2 is a driver of neuroendocrine prostate cancer
 
+## structure layout
+~~~
+project_PRJNA416257/
+├─ 1) Get sra sample list          
+├─ sra_fastq/                    
+├─ ref/                         
+├─ mapping/                     
+├─ r/                           
+
+
+
+
+
+
 ## Folder layout
 ~~~
-# bash
 project_PRJNA416257/
 ├─ sra/              # sra
 ├─ sra_fastq/        # FASTQs
@@ -14,14 +27,14 @@ project_PRJNA416257/
 ├─ mapping/          # raw_counts.csv
 ├─ r/                # DE tables, plots, GSEA
 ~~~
-## 1) Get the SRR runs & metadata 
+## 1) Get sample list 
 <https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE106305>
 
 <https://www.ncbi.nlm.nih.gov/Traces/study/?acc=PRJNA416257&o=acc_s%3Aa>
 
 ![samplelist](figures/sample_list.jpg)
 
-## 2) Download FASTQs
+## 2) Download sra file and extract FASTQs file 
 ### 2.1) intsall fasterq-dump 
 
 *fasterq-dump is a tool from SRA-tools (the NCBI Sequence Read Archive toolkit)*
