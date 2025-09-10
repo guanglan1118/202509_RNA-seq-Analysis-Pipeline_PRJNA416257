@@ -19,7 +19,7 @@ project_PRJNA416257/
 
 <https://www.ncbi.nlm.nih.gov/Traces/study/?acc=PRJNA416257&o=acc_s%3Aa>
 
-![samplelist](figures/sample_list.png)
+![samplelist](figures/sample_list.jpg)
 
 ## 2) Download FASTQs
 ### 2.1) intsall fasterq-dump 
