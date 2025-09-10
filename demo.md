@@ -213,7 +213,7 @@ eval "$(conda shell.bash hook)"
 conda activate sra
 
 # Change to working directory
-cd /research/groups/yanggrp/home/glin/work_2025/Sep/project_PRJNA1014743/ref
+cd ***work_2025/Sep/project_PRJNA1014743/ref
 rm -rf STAR_index_gencodev44 _STARtmp
 mkdir -p STAR_index_gencodev44
 
@@ -269,7 +269,7 @@ set -euo pipefail
 PROJECT="/research/groups/yanggrp/home/glin/work_2025/Sep/project_PRJNA416257"
 FASTQ_DIR="${PROJECT}/sra/fastq"   # your FASTQs are here (single-end)
 GENOME_DIR="${PROJECT}/ref/STAR_index_gencodev44"
-GTF="/research/groups/yanggrp/home/glin/work_2025/Sep/project_PRJNA1014743/ref/gencode.v44.annotation.gtf"
+GTF="***work_2025/Sep/project_PRJNA1014743/ref/gencode.v44.annotation.gtf"
 OUTROOT="${PROJECT}/mapping"       # all results go here
 THREADS=${LSB_DJOB_NUMPROC:-16}    # LSF core count (default 16)
 
@@ -407,7 +407,7 @@ set -euo pipefail
 # =========================
 # Project-specific settings
 # =========================
-PROJECT="/research/groups/yanggrp/home/glin/work_2025/Sep/project_PRJNA416257"
+PROJECT="***/work_2025/Sep/project_PRJNA416257"
 FASTQ_DIR="${PROJECT}/sra/fastq"   # your FASTQs are here (single-end)
 GENOME_DIR="${PROJECT}/ref/STAR_index_gencodev44"
 GTF="/research/groups/yanggrp/home/glin/work_2025/Sep/project_PRJNA1014743/ref/gencode.v44.annotation.gtf"
