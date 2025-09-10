@@ -33,7 +33,7 @@ Note: fasterq-dump is faster but doesn’t gzip; we’ll compress with pigz.
 
 <https://www.ncbi.nlm.nih.gov/Traces/study/?acc=PRJNA416257&o=acc_s%3Aa>
 
-![samplelist](sample_list.jpg)
+![samplelist](figures/sample_list.jpg)
 
 ## (2) Fetch SRA & make FASTQ
 ### (2.1) Fetch single case 
