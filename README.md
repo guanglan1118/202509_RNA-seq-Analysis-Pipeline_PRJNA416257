@@ -6,7 +6,7 @@
 - Nat Commun.2019/PMID: 30655535
 - ONECUT2 is a driver of neuroendocrine prostate cancer
 
-## Folder layoutv
+## Folder layout
 ~~~
 project_PRJNA416257/
 ├─ sra/              # sra
